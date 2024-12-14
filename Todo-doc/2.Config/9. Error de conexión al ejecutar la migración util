@@ -1,0 +1,267 @@
+9. Error de conexión al ejecutar la migración utilizando WSL2 con Debian 12
+
+Se configurado todo lo establecido para la conexion local desde Debian con WSL2 para la base de datos PostgreSQL y en el proyeto se tiene creado e modelo Todo.php de la siguiente manera:
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Todo extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'completed'
+    ];
+}
+
+La migración de la misma manera fue creada:
+
+create_todos_table.php
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('todos', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->boolean('completed');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('todos');
+    }
+};
+
+y en la terminal de Debian quiero ejecutar la migración saliendome el siguiente error:
+
+ kool run artisan migrate
+
+   Illuminate\Database\QueryException
+
+  SQLSTATE[08006] [7] connection to server at "database" (172.19.0.4), port 5433 failed: Connection refused
+        Is the server running on that host and accepting TCP/IP connections? (Connection: pgsql, SQL: select * from information_schema.tables where table_catalog = laravel and table_schema = public and table_name = migrations and table_type = 'BASE TABLE')
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+    825▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕                 );
+    827▕             }
+    828▕
+  ➜ 829▕             throw new QueryException(
+    830▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831▕             );
+    832▕         }
+    833▕     }
+
+
+
+El error indica que Laravel no puede conectarse al servidor de PostgreSQL en la IP 172.19.0.4 y el puerto 5433. Esto puede deberse a una configuración incorrecta en los parámetros de conexión de tu proyecto Laravel.
+
+Aquí tienes los pasos para revisar y corregir la configuración de la base de datos:
+1. Verifica la Configuración en .env
+
+Asegúrate de que los parámetros de conexión en el archivo .env de tu proyecto Laravel estén configurados correctamente para conectar con PostgreSQL. Los valores deben coincidir con la configuración de PostgreSQL en WSL2. Abre el archivo .env y verifica los siguientes parámetros:
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1           # Si estás en Docker, verifica la IP del contenedor
+DB_PORT=5433                # Cambia esto al puerto en el que PostgreSQL está escuchando
+DB_DATABASE=laravel         # Asegúrate de que este sea el nombre de tu base de datos
+DB_USERNAME=dev             # El nombre de usuario que creaste
+DB_PASSWORD=your_password   # La contraseña configurada
+
+Si estás ejecutando PostgreSQL directamente en WSL2, DB_HOST puede ser 127.0.0.1. Pero si estás usando Docker, cambia DB_HOST a la IP del contenedor.
+
+
+2. Verifica la Conexión a PostgreSQL
+
+Para asegurarte de que puedes conectarte a la base de datos, intenta hacer una conexión manual con psql desde la terminal:
+
+psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+
+Si esto funciona, significa que el servidor está activo y escuchando en el puerto y dirección correctos.
+3. Prueba la Migración de Laravel
+
+Después de asegurarte de que la conexión funciona, vuelve a intentar ejecutar la migración:
+
+php artisan migrate
+
+Solución Alternativa: Uso de IP Correcta en Docker
+
+Si PostgreSQL está corriendo en Docker y Laravel en WSL2, puede ser que necesites asignar la IP del contenedor de PostgreSQL como DB_HOST. Para obtener la IP, ejecuta:
+
+docker inspect <nombre_o_id_del_contenedor> | grep "IPAddress"
+
+Actualiza .env con esta IP en DB_HOST y vuelve a intentar la conexión.
+
+Si sigues teniendo problemas, confirma los pasos adicionales que hiciste o mensajes específicos de error para ayudarte a encontrar otra solución.
+
+
+Dijiste:
+Porblem mis coneciones con los siguiente parametros y obtibe acceso a la base de datos eso significa que el servidor esta activo y escuchando corretamente:
+
+$ psql -h localhost -p 5433 -U dev -d laravel
+Password for user dev:
+psql (15.8 (Debian 15.8-0+deb12u1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)
+Type "help" for help.
+
+laravel=> \q
+
+klvst3r@rog:~/dev/todo/todos$ psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+Password for user dev:
+psql (15.8 (Debian 15.8-0+deb12u1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)
+Type "help" for help.
+
+laravel=> \q
+
+Pero al probar la migracion sale el error:
+kool run artisan migrate
+
+   Illuminate\Database\QueryException
+
+  SQLSTATE[08006] [7] connection to server at "localhost" (::1), port 5433 failed: Connection refused
+        Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5433 failed: Connection refused
+        Is the server running on that host and accepting TCP/IP connections? (Connection: pgsql, SQL: select * from information_schema.tables where table_catalog = laravel and table_schema = public and table_name = migrations and table_type = 'BASE TABLE')
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+    825▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕                 );
+    827▕             }
+    828▕
+  ➜ 829▕             throw new QueryException(
+    830▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831▕             );
+    832▕         }
+    833▕     }
+
+      +35 vendor frames
+
+  36  artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+exit status 1
+ChatGPT dijo:
+
+
+
+
+Dado que puedes conectarte a PostgreSQL manualmente con psql pero la migración falla, parece que kool run artisan migrate podría estar usando una configuración diferente o un contenedor distinto que no tiene acceso a la base de datos en localhost:5433. Aquí tienes algunos pasos que puedes seguir para resolver el problema:
+
+
+1. Verifica la Configuración en el Archivo .env
+
+Confirma que los parámetros en el archivo .env de tu proyecto Laravel estén configurados correctamente. Dado que ya has verificado la conexión manual con 127.0.0.1, asegúrate de que .env tiene el siguiente contenido:
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1  # o la IP de PostgreSQL en caso de Docker
+DB_PORT=5433
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=your_password  # cambia esto por la contraseña correcta
+
+Después de realizar cambios en el archivo .env, ejecuta:
+
+php artisan config:cache
+
+Esto asegura que Laravel esté usando la configuración actualizada.
+
+
+2. Prueba artisan migrate sin kool
+
+Para ver si kool es la causa del problema, intenta ejecutar la migración directamente en la terminal, sin el contenedor kool:
+
+php artisan migrate
+
+Si esta migración funciona sin problemas, entonces el problema está en la configuración de red entre kool y tu entorno de WSL2.
+
+
+3. Configura la Red de kool para Acceder a PostgreSQL
+
+Si necesitas usar kool, verifica que el entorno kool pueda conectarse a PostgreSQL. Puede que kool esté corriendo en un contenedor aislado sin acceso a 127.0.0.1. Si PostgreSQL corre en WSL2, puedes intentar acceder mediante la IP de WSL, que puede obtenerse con:
+
+ifconfig
+
+Toma la dirección IP de la interfaz de WSL2 (probablemente similar a 172.x.x.x) y usa esa IP en lugar de 127.0.0.1 en el archivo .env:
+
+DB_HOST=172.x.x.x  # IP de WSL2
+
+Luego, vuelve a ejecutar kool run artisan migrate.
+
+
+4. Asegúrate de Que PostgreSQL Acepte Conexiones Externas
+
+Confirma que PostgreSQL esté configurado para aceptar conexiones desde cualquier IP y no solo desde localhost. Abre el archivo de configuración postgresql.conf y asegúrate de que listen_addresses esté configurado de la siguiente manera:
+
+listen_addresses = '*'
+
+Luego, asegúrate de que pg_hba.conf permita conexiones desde la IP de WSL2 que kool esté usando, con una línea como esta:
+
+host    all             dev             0.0.0.0/0               md5
+
+Reinicia PostgreSQL:
+
+sudo service postgresql restart
+
+Intenta nuevamente ejecutar kool run artisan migrate. Esto debería permitir a kool conectarse a PostgreSQL usando la configuración correcta.
+
+
+Estoy utilizando docker como se la ip de PostgresqL
+----------------------------------------------------
+
+Para conocer la IP de tu contenedor de PostgreSQL en Docker, puedes seguir estos pasos:
+1. Encuentra el Nombre o ID del Contenedor de PostgreSQL
+
+Primero, identifica el contenedor ejecutando:
+
+docker ps
+
+Busca el contenedor de PostgreSQL en la lista y toma nota de su CONTAINER ID o NAMES.
+
+
+2. Obtén la IP del Contenedor de PostgreSQL
+
+Luego, usa el siguiente comando, reemplazando CONTAINER_ID con el ID o nombre del contenedor que encontraste en el paso anterior:
+
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' CONTAINER_ID
+
+Este comando mostrará la dirección IP interna del contenedor.
+
+
+3. Configura Laravel para Conectarse a Esta IP
+
+Con la IP obtenida, puedes configurarla en el archivo .env de Laravel de la siguiente manera:
+
+DB_CONNECTION=pgsql
+DB_HOST=ip_obtenida  # Reemplaza con la IP del contenedor PostgreSQL
+DB_PORT=5432         # El puerto predeterminado de PostgreSQL
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=your_password
+
+Luego, ejecuta:
+
+php artisan config:cache
+
+Esto debería permitir que Laravel se conecte al contenedor de PostgreSQL usando la IP que encontraste.

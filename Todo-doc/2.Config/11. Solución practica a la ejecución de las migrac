@@ -1,0 +1,330 @@
+11. Solución practica a la ejecución de las migraciones
+
+Cuando ejecutamos la migración nos genera el siguiente error:
+
+Intente con el suasrio postgres pero me gereo el error:
+
+El error aún sugiere que el usuario dev no tiene permisos suficientes para crear tablas en el esquema public de la base de datos laravel. Es posible que el usuario aún necesite permisos específicos o que las configuraciones previas no se aplicaron correctamente.
+
+Aquí hay algunos pasos adicionales que puedes
+Dijiste:
+Pero tengo acceso con el usuario psql que no tiene contraseña, puedo realizar mis migraciones con el, para no estar configurando al usuario dev
+ChatGPT dijo:
+ChatGPT
+
+Sí, si tienes acceso al usuario postgres sin contraseña y puedes ejecutar migraciones, esa es una solución práctica para avanzar sin necesidad de configurar los permisos para el usuario dev. Para hacerlo, solo necesitas ajustar la configuración en tu archivo .env para usar el usuario postgres.
+Modificación del archivo .env
+
+Cambia los valores de usuario y contraseña en el archivo .env para que quede así:
+
+DB_CONNECTION=pgsql
+DB_HOST=172.22.109.99
+DB_PORT=5433
+DB_DATABASE=laravel
+DB_USERNAME=postgres
+DB_PASSWORD=
+
+Ejecuta las migraciones
+
+Una vez que hayas guardado los cambios en .env, puedes intentar ejecutar nuevamente las migraciones:
+
+php artisan migrate
+
+Usar el usuario postgres permitirá realizar todas las operaciones sin restricciones, ya que este usuario tiene todos los permisos necesarios en la base de datos.
+
+
+kool run artisan migrate INFO Preparing database. Creating migration table ................................................................................................................ 4ms FAIL Illuminate\Database\QueryException SQLSTATE[42501]: Insufficient privilege: 7 ERROR: permission denied for schema public at character 14 (Connection: pgsql, SQL: create table "migrations" ("id" serial not null primary key, "migration" varchar(255) not null, "batch" integer not null)) at vendor/laravel/framework/src/Illuminate/Database/Connection.php:829 825▕ $this->getName(), $query, $this->prepareBindings($bindings), $e 826▕ ); 827▕ } 828▕ ➜ 829▕ throw new QueryException( 830▕ $this->getName(), $query, $this->prepareBindings($bindings), $e 831▕ ); 832▕ } 833▕ } +39 vendor frames 40 artisan:37 Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\Argv Input), Object(Symfony\Component\Console\Output\Console Output))
+
+Lo que podemos ver es que existe un error de sentencia SQL 42501
+
+Asi que eejecute lo siguiente
+
+
+
+Como el usuario dev no tuvo los permisos necesarios, lo que optamos por relizar fue lo siguiente:
+
+1. Configuración archiovo .env
+Dentro del archivo de configuración cambiamos al usuario dev por el usuario postgres de la siguiente manera:
+
+	DB_CONNECTION=pgsql
+	DB_HOST=172.22.109.99
+	DB_PORT=5433
+	DB_DATABASE=laravel
+	DB_USERNAME=postgres
+	DB_PASSWORD=
+
+
+
+
+2. Otorgar permisos al usuario	
+
+Verificando el rol tenemos:
+
+postgres=# \du my_database_user
+            List of roles
+  Role name  | Attributes | Member of 
+-------------+------------+-----------
+ dev		 |            | {}
+
+and:
+
+postgres=# SELECT * FROM pg_roles;
+rolname          | rolsuper | rolinherit | rolcreaterole | rolcreatedb | rolcanlogin | rolreplication | rolconnlimit | rolpassword | rolvaliduntil | rolbypassrls | rolconfig |  oid  
+---------------------------+----------+------------+---------------+-------------+-------------+----------------+--------------+-------------+---------------+--------------+-----------+-------
+ dev              | f        | t          | f             | f           | t           | f              |           -1 | ********    |               | f            |           | 16389
+
+    postgresqllaravel-10
+
+
+3. Cenexion con el super superusuario de Postgres
+
+Nos conectamos con el super usuario de postgres 
+
+sudo -u postgres psql
+could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+Listamos los roles
+postgres=# \du dev
+           List of roles
+ Role name | Attributes | Member of
+-----------+------------+-----------
+ dev       |            | {}
+
+
+
+postgres=# SELECT * FROM pg_roles;
+postgres=# SELECT * FROM pg_roles;
+
+
+4. Otorgando permisos en el Schema
+
+Estamos otorgando permiso al esquema de la siguiente manera:
+
+
+postgres=# GRANT CREATE ON SCHEMA public TO dev;
+GRANT
+postgres=# SELECT * FROM pg_roles;
+
+[2]+  Stopped                 sudo -u postgres psql
+
+
+
+Probablemente se apor que en PostgreSQL v15 o superior. Los permisos por default en el Schema "public" han cambiado. Antes los valores eran inseguros y a todos se les permitia "public" para crear objetos en el Schema "public". Ahora solo el dueño de la base de datos puede hacer eso, a menos que el usuario nuevo tenga privilegios extra.
+
+Se resume de la siguiente manera:
+
+1. Nos logeamos a PostgreSQL con el usuario superadmin con privilegios
+2. Cambiamos la base de datos
+Otorgamos permisos CREATE en el schema 'public' del usuario objetivo
+
+Por ejemplo:
+$ sudo -u postgres psql
+postgres=# \c laravel 
+postgres=# GRANT CREATE ON SCHEMA public TO dev;
+
+
+klvst3r@rog:~/dev/todo/todos$ sudo -u postgres psql
+could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+
+postgres=# \c laravel
+You are now connected to database "laravel" as user "postgres".
+laravel=# GRANT CREATE ON SCHEMA public TO dev;
+GRANT
+laravel=# \ds public.*
+Did not find any relation named "public.*".
+laravel=# \q
+klvst3r@rog:~/dev/todo/todos$ sudo -u postgres psql
+could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+postgres=# \dn+ public
+                                       List of schemas
+  Name  |       Owner       |           Access privileges            |      Description
+--------+-------------------+----------------------------------------+------------------------
+ public | pg_database_owner | pg_database_owner=UC/pg_database_owner+| standard public schema
+        |                   | =U/pg_database_owner                  +|
+        |                   | dev=UC/pg_database_owner               |
+(1 row)
+
+postgres=# SELECT * FROM pg_roles;
+postgres=# \q
+klvst3r@rog:~/dev/todo/todos$ kool run artisan migrate
+
+   INFO  Preparing database.
+
+  Creating migration table ............................................................................................................... 23ms DONE
+
+   INFO  Running migrations.
+
+  2014_10_12_000000_create_users_table ................................................................................................... 21ms DONE
+  2014_10_12_100000_create_password_reset_tokens_table .................................................................................... 9ms DONE
+  2019_08_19_000000_create_failed_jobs_table ............................................................................................. 17ms DONE
+  2019_12_14_000001_create_personal_access_tokens_table .................................................................................. 20ms DONE
+  2024_11_10_044540_create_todos_table .................................................................................................... 8ms DONE
+
+
+ Recapitulando y para quienes puedan encontrar útil este enfoque:
+Pasos importantes que resolvieron el problema
+
+    Permisos en el esquema public:
+        El comando GRANT CREATE ON SCHEMA public TO dev; fue clave para dar al usuario dev permisos de creación en el esquema public, lo cual permitió realizar las migraciones necesarias en la base de datos sin errores de permisos.
+
+    Verificación de acceso a la base de datos:
+        Confirmaste que el usuario dev tenía los permisos adecuados para interactuar con el esquema public, revisando la lista de roles y accesos.
+
+    Ejecución exitosa de migraciones:
+        Finalmente, al ejecutar kool run artisan migrate, las migraciones se completaron sin problemas, lo que indica que los permisos en la configuración actual están correctamente asignados.
+
+Conclusión
+
+Si alguien enfrenta un error de privilegios insuficientes al intentar ejecutar migraciones con PostgreSQL en Laravel, estos pasos pueden ser útiles:
+
+    Asegurarse de que el usuario de base de datos tiene permisos CREATE sobre el esquema public.
+    Revisar la configuración del archivo .env para asegurarse de que el usuario y la base de datos sean correctos.
+    Ejecutar las migraciones con el comando php artisan migrate (o usando una herramienta de gestión como kool si está disponible).
+
+
+    Para tener mas detallado la solución aca un resumen:
+
+     Recapitulando y para quienes puedan encontrar útil este enfoque:
+Pasos importantes que resolvieron el problema
+
+    Permisos en el esquema public:
+        El comando GRANT CREATE ON SCHEMA public TO dev; fue clave para dar al usuario dev permisos de creación en el esquema public, lo cual permitió realizar las migraciones necesarias en la base de datos sin errores de permisos.
+
+    Verificación de acceso a la base de datos:
+        Confirmaste que el usuario dev tenía los permisos adecuados para interactuar con el esquema public, revisando la lista de roles y accesos.
+
+    Ejecución exitosa de migraciones:
+        Finalmente, al ejecutar kool run artisan migrate, las migraciones se completaron sin problemas, lo que indica que los permisos en la configuración actual están correctamente asignados.
+
+Conclusión
+
+Si alguien enfrenta un error de privilegios insuficientes al intentar ejecutar migraciones con PostgreSQL en Laravel, estos pasos pueden ser útiles:
+
+    Asegurarse de que el usuario de base de datos tiene permisos CREATE sobre el esquema public.
+    Revisar la configuración del archivo .env para asegurarse de que el usuario y la base de datos sean correctos.
+    Ejecutar las migraciones con el comando php artisan migrate (o usando una herramienta de gestión como kool si está disponible).
+
+¡Gracias por compartir esta solución y me alegra que hayas resuelto el problema!
+Dijiste:
+Voy a  intentar lo mismo pero con el susaurio dev en mi configuración del archivo .env
+
+DB_CONNECTION=pgsql
+DB_HOST=172.22.109.99
+DB_PORT=5433
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=desarrollo
+
+Y ejecutando la migración, pero como deshago la migración ya ejecutada
+ChatGPT dijo:
+ChatGPT
+
+Para revertir las migraciones ya ejecutadas y dejar la base de datos en el estado inicial, puedes usar el comando migrate:rollback de Laravel. Esto revertirá las migraciones aplicadas en el último lote (última vez que ejecutaste migraciones).
+
+Aquí tienes los pasos para hacerlo:
+
+    Revertir las últimas migraciones ejecutadas:
+
+php artisan migrate:rollback
+
+Este comando deshará el último lote de migraciones. Si deseas revertir más de un lote, puedes añadir la opción --step para especificar cuántos lotes deseas revertir. Por ejemplo, para revertir los últimos dos lotes:
+
+php artisan migrate:rollback --step=2
+
+Revertir todas las migraciones (opcional):
+
+Si deseas deshacer todas las migraciones y dejar la base de datos como estaba antes de ejecutar cualquier migración, puedes usar:
+
+php artisan migrate:reset
+
+Esto eliminará todas las tablas creadas por las migraciones.
+
+Reaplicar las migraciones (opcional):
+
+Después de revertirlas, si deseas volver a aplicar todas las migraciones desde cero con el usuario dev en tu configuración .env, puedes ejecutar:
+
+    php artisan migrate
+
+Estos comandos te permitirán deshacer las migraciones previamente ejecutadas y aplicar cambios en el usuario o permisos en caso de que decidas hacer ajustes adicionales en la base de datos.
+Dijiste:
+Parece que funciono deshice la migraciónes con:
+ kool run artisan migrate:reset
+
+Teniendo los valores de mi usuario dev
+DB_CONNECTION=pgsql
+DB_HOST=172.22.109.99
+DB_PORT=5433
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=desarrollo
+
+Y ejecutando nuevamente las migraciones:
+kool run artisan migrate
+
+   INFO  Running migrations.
+
+  2014_10_12_000000_create_users_table ................................................................................................... 16ms DONE
+  2014_10_12_100000_create_password_reset_tokens_table .................................................................................... 9ms DONE
+  2019_08_19_000000_create_failed_jobs_table ............................................................................................. 21ms DONE
+  2019_12_14_000001_create_personal_access_tokens_table .................................................................................. 20ms DONE
+  2024_11_10_044540_create_todos_table .................................................................................................... 7ms DONE
+
+Parece ser que el comando:
+GRANT CREATE ON SCHEMA public TO dev; 
+
+Fue la pieza clave
+ChatGPT dijo:
+ChatGPT
+
+¡Excelente! Me alegra saber que funcionó. Efectivamente, el comando
+
+GRANT CREATE ON SCHEMA public TO dev;
+
+fue clave para dar al usuario dev el permiso necesario para crear tablas en el esquema public. Esto permitió que las migraciones se ejecutaran correctamente.
+
+Si necesitas realizar más configuraciones de permisos, ten en cuenta que los comandos GRANT en PostgreSQL son bastante útiles para ajustar los privilegios específicos en esquemas, tablas y otros objetos de la base de datos. También puedes verificar los permisos actuales con \dn+ en psql, como lo hiciste anteriormente.
+
+
+El entorno que utilice es Docker con Windows, y Debian 12 con WSL2, el proyecto es con laravel Laravel v10.48.22 (PHP v8.1.30) y la base de datos fue PostgreSQL 15, empleando la herramienta Kool dev, y los parametros generales de mi archivo .env son:
+
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=pgsql
+DB_HOST=172.22.109.99
+DB_PORT=5433
+DB_DATABASE=laravel
+DB_USERNAME=postgres
+DB_PASSWORD=
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_HOST=cache
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+Considerando que posteriormente utilice el usuario dev con los permisos necesarios 
+
+Estos pasos y ajustes serán muy útiles para quienes se encuentren con configuraciones similares en Docker, WSL2 y Laravel.
+
+La configuración de PostgreSQL en comparación con MySQL tiene algunas particularidades, especialmente en el manejo de permisos y esquemas, como lo notaste. Es un cambio interesante que puede ofrecer nuevas ventajas, sobre todo en ambientes más complejos y para aprovechar algunas de las características avanzadas de PostgreSQL.
+
+Si necesitas ayuda en el futuro con más configuraciones o si decides explorar otras características avanzadas de PostgreSQL, como el manejo de índices o transacciones, ¡aquí estaré para ayudarte! 

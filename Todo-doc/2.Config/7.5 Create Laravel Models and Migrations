@@ -1,0 +1,28 @@
+7.5 Create Laravel Models and Migrations
+
+Si recordamos sobre el archivo kool yam, recordemos que podemos ejecutar ciertos comandos directamente utilizando la jerramienta kool 
+
+Tambien se quiere puede utilizar php artisan comandos
+
+Vamos a crear la migración 
+	$ kool run artisan make:model Todo --migration
+
+Con esto se creara la migración llamada Todo
+
+Modificamos nuestra migración 
+
+..
+
+Ahora vamos a la migracion creada para adecuarla al titulo y las propiedades establecidas en el Modelo
+
+..
+
+Teniendo la migracion podemos ir a nuestro PgAdmin, vamos a los esquemas de la base de datros laravel, verificando que no existan tablas
+
+Regresando a la terminal ejecutamos la migracion de la siguiente manera:
+	$ kool run artisan migrate
+
+
+Verificamos que la migracion se haya ejecutado y podremos ir a pgAmin para verificar que efectianete se ha creado la tabla correspondiende segun nuestra migración.
+
+con esto podremos iniciar a crear nuestra API con nuestros controladores

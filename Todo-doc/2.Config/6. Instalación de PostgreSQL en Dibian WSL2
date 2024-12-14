@@ -1,0 +1,444 @@
+    6. Instalación de PostgreSQL en Dibian WSL2
+
+si intentamos conectarnos con nuestra base de datos y nos genera error, probablemente no tengamos instalado PostgreSQL en nuestro sistema Debian en WSL2, o no existe un usuario postgres que es el que se utiliza por defecto para administrar 
+
+PostgreSQL. Aquí tienes los pasos para instalar PostgreSQL y configurar el usuario postgres en tu entorno WSL2:
+
+1. Verifica si PostgreSQL está instalado
+
+Primero, ejecuta el siguiente comando para verificar si PostgreSQL ya está instalado:
+
+	$ psql --version
+
+Si el comando devuelve un error o indica que no se encuentra psql, entonces necesitas instalar PostgreSQL.
+
+2. Instala PostgreSQL
+
+Para instalar PostgreSQL en Debian, usa el siguiente comando:
+
+	$ sudo apt update
+	$ sudo apt install postgresql postgresql-contrib
+
+Esto instalará PostgreSQL y configurará el usuario postgres automáticamente.
+
+2.5. Podemos crear un usuario alterno para poder trabajar con la base de datos
+
+	Primero ingrasamos con el usuario estandar
+		$ sudo -u postgres psql
+
+Luego, ejecuta los siguientes comandos en la consola de PostgreSQL para crear el usuario root con una contraseña:
+
+    CREATE USER root WITH PASSWORD 'tu_contraseña_segura';
+    ALTER ROLE root SET client_encoding TO 'utf8';
+    ALTER ROLE root SET default_transaction_isolation TO 'read committed';
+    ALTER ROLE root SET timezone TO 'UTC';
+    GRANT ALL PRIVILEGES ON DATABASE laravel TO root;
+
+    A manera de ejemplo para nuestro poryecto utilizaremos el usuario 'dev' y la conytraseña 'desarrollo'
+
+    quedando la configuración de la siguiente manera:
+
+     CREATE USER dev WITH PASSWORD 'desarrollo';
+     ALTER ROLE dev SET client_encoding TO 'utf8';
+     ALTER ROLE dev SET default_transaction_isolation TO 'read committed';
+     ALTER ROLE dev SET timezone TO 'UTC';
+     GRANT ALL PRIVILEGES ON DATABASE laravel TO dev;
+
+
+solucion de errores 
+----------------------------------------------------------------
+Accedi con el usuario postgres con el comando: 
+sudo -i -u postgres
+
+Para ingresar a la consola de PostgreSQL con: 
+ psql
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5433" failed: No such file or directory
+        Is the server running locally and accepting connections on that socket?
+
+Que signiifica este error
+
+
+El error que estás viendo significa que el servidor de PostgreSQL no se está ejecutando o está configurado para usar un puerto o ruta de socket diferente (aquí indica el puerto 5433, que no es el predeterminado).
+
+Aquí tienes los pasos para solucionar este problema:
+1. Verifica el estado del servicio de PostgreSQL
+
+Ejecuta el siguiente comando para verificar si PostgreSQL está en ejecución:
+
+sudo service postgresql status
+
+
+Al no permitir verificar el estado con este usuario me cambio al usuario admin de mi WSL2 - debian -> klvst3r para entrar a la base de datos y crear el usaurio:
+
+ sudo service postgresql start
+Starting PostgreSQL 15 database server: main.
+klvst3r@rog:~/dev/todo/todos$ sudo -u postgres psql
+could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+postgres=#
+
+
+    Si ves que el servicio está detenido o no está en ejecución, intenta iniciarlo con el siguiente comando:
+
+    sudo service postgresql start
+
+    Si PostgreSQL inicia correctamente, intenta nuevamente acceder a la consola con psql.
+
+2. Revisa el puerto de PostgreSQL en el archivo de configuración
+
+Por defecto, PostgreSQL escucha en el puerto 5432. Si está configurado para escuchar en otro puerto, debes actualizar el archivo de configuración. Sigue estos pasos:
+
+    Abre el archivo de configuración de PostgreSQL:
+
+sudo nano /etc/postgresql/*/main/postgresql.conf
+
+Busca la línea que comienza con port y asegúrate de que esté configurada en 5432:
+
+    port = 5432
+
+    Guarda y cierra el archivo si realizaste algún cambio.
+
+3. Reinicia el servicio de PostgreSQL
+
+Si realizaste cambios en el archivo de configuración, reinicia el servicio para que los cambios surtan efecto:
+
+sudo service postgresql restart
+
+4. Verifica la ruta del socket
+
+Si el problema persiste, puede ser que PostgreSQL esté configurado para usar una ruta de socket distinta a la que psql está buscando. Esto suele ser raro, pero puedes verificarlo en el archivo de configuración de PostgreSQL (postgresql.conf) y asegurarte de que unix_socket_directories esté configurado correctamente:
+
+unix_socket_directories = '/var/run/postgresql'
+
+5. Conecta especificando el puerto (opcional)
+
+Si PostgreSQL está configurado para escuchar en el puerto 5433 (o un puerto diferente al 5432), puedes conectarte directamente desde psql especificando el puerto:
+
+psql -p 5433 -U postgres
+
+Reemplaza 5433 con el puerto configurado en tu archivo postgresql.conf.
+
+Después de estos pasos, deberías poder conectarte a PostgreSQL sin problemas.
+
+
+
+Creación de la base de datos laravel para nuestro proyecto
+-------------------------------------------------------------
+
+Al poder ingresar a la base de datos de postgresql pude crear el usuario siguiente las siguientes instrucciones:
+ CREATE USER dev WITH PASSWORD 'desarrollo';
+     ALTER ROLE dev SET client_encoding TO 'utf8';
+     ALTER ROLE dev SET default_transaction_isolation TO 'read committed';
+     ALTER ROLE dev SET timezone TO 'UTC';
+     GRANT ALL PRIVILEGES ON DATABASE laravel TO dev;
+
+Pero en la ultima me marco el error siguiente:
+
+ GRANT ALL PRIVILEGES ON DATABASE laravel TO dev;
+ERROR:  database "laravel" does not exist
+ChatGPT dijo:
+ChatGPT
+
+El error que te muestra PostgreSQL indica que la base de datos laravel aún no ha sido creada. Para solucionarlo, primero necesitas crear la base de datos y luego asignar los privilegios al usuario dev.
+
+Aquí tienes los pasos para hacerlo:
+
+    Crea la base de datos laravel:
+
+    Asegúrate de estar en la consola de PostgreSQL como el usuario postgres y luego ejecuta el siguiente comando:
+
+CREATE DATABASE laravel;
+
+Esto creará la base de datos laravel.
+
+Otorga privilegios al usuario dev en la base de datos recién creada:
+
+Ahora puedes ejecutar el comando GRANT para otorgarle todos los privilegios sobre la base de datos laravel al usuario dev:
+
+GRANT ALL PRIVILEGES ON DATABASE laravel TO dev;
+
+Verifica la conexión en Laravel:
+
+Asegúrate de que el archivo .env de Laravel esté configurado correctamente:
+
+DB_CONNECTION=pgsql
+DB_HOST=172.29.160.107
+DB_PORT=5432
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=desarrollo
+
+Prueba la conexión desde Laravel ejecutando una migración, por ejemplo:
+
+    php artisan migrate
+
+Estos pasos deberían resolver el problema y permitir que tu aplicación Laravel se conecte a la base de datos laravel usando el usuario dev.
+
+
+Para salir de la consola de PostgreSQL, simplemente escribe el siguiente comando:
+
+\q
+
+
+Hay un detalle a marcar con mi usuario creado en postgresql
+
+sudo -u dev psql
+sudo: unknown user dev
+sudo: error initializing audit plugin sudoers_audit
+ChatGPT dijo:
+
+El error se debe a que dev es un usuario de PostgreSQL, pero no un usuario del sistema operativo Debian en tu WSL2. Cuando usas sudo -u dev psql, el sistema intenta encontrar un usuario dev en el sistema operativo, no en PostgreSQL.
+
+Para conectarte a PostgreSQL como el usuario dev, utiliza el siguiente comando directamente desde tu terminal:
+
+psql -U dev -d nombre_base_de_datos
+
+Si deseas conectarte a la base de datos laravel, el comando sería:
+
+psql -U dev -d laravel
+
+Esto te pedirá la contraseña de dev. Asegúrate de ingresar la que configuraste (en tu caso, desarrollo).
+Nota
+
+Si tienes PostgreSQL configurado en un puerto diferente al predeterminado (5432), también puedes especificarlo:
+
+psql -U dev -d laravel -p 5433
+
+Este comando permite conectarte a PostgreSQL sin necesidad de crear un usuario dev en el sistema operativo.
+
+
+E el intento de hacer conexion con la PostgreSQL con el suaurio dev me marca el siguiente eror:
+
+ psql -U dev -d laravel
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5433" failed: FATAL:  Peer authentication failed for user "dev"
+
+
+Este error ocurre porque PostgreSQL está intentando autenticar al usuario dev mediante el método de autenticación peer, que requiere que el nombre de usuario del sistema operativo coincida con el nombre de usuario de PostgreSQL. Para resolverlo, puedes cambiar el método de autenticación a password en el archivo de configuración pg_hba.conf.
+
+Aquí están los pasos para hacerlo:
+
+    Edita el archivo pg_hba.conf:
+
+    Abre el archivo de configuración de PostgreSQL pg_hba.conf. Por lo general, se encuentra en:
+
+sudo nano /etc/postgresql/<versión>/main/pg_hba.conf
+
+
+Para nuestra instalación tenemos la version 15
+
+	$ sudo nano /etc/postgresql/15/main/pg_hba.conf
+
+
+
+Reemplaza <versión> con el número de la versión de PostgreSQL que estás usando, por ejemplo, 15, 14, etc.
+
+Busca la línea de configuración del usuario dev:
+
+Encuentra la línea que se aplica a las conexiones locales y modifica el método de autenticación de peer a md5 o password. La línea debería quedar similar a esta:
+
+local   all             dev                                     md5
+
+O, si prefieres que todos los usuarios usen autenticación por contraseña:
+
+local   all             all                                     md5
+
+Usar md5 permitirá la autenticación mediante una contraseña en lugar de peer.
+
+Guarda y cierra el archivo.
+
+Reinicia el servicio de PostgreSQL para aplicar los cambios:
+
+sudo service postgresql restart
+
+Prueba la conexión nuevamente:
+
+Ahora intenta conectarte como el usuario dev:
+
+    psql -U dev -d laravel
+
+Esto debería resolver el problema de autenticación y permitirte acceder a PostgreSQL con el usuario dev.
+
+
+Configuración del puerto:
+
+En tu archivo de configuración pg_hba.conf, la parte relacionada con el puerto no se configura allí, sino en otro archivo llamado postgresql.conf. El archivo pg_hba.conf se encarga solo de los métodos de autenticación y los accesos, mientras que el archivo postgresql.conf es el que gestiona las configuraciones del servidor, como el puerto en el que escucha.
+1. Cambiar el puerto en postgresql.conf
+
+Para cambiar o verificar el puerto de PostgreSQL, sigue estos pasos:
+
+    Abre el archivo postgresql.conf con un editor de texto:
+
+sudo nano /etc/postgresql/15/main/postgresql.conf
+
+Busca la línea que comienza con port (puede estar comentada con un #), y asegúrate de que esté configurada con el puerto que deseas usar (por defecto es 5432):
+
+port = 5432
+
+Si quieres usar el puerto 5433 (que aparece en tus mensajes de error), cámbialo a:
+
+port = 5433
+
+Guarda el archivo y sal del editor (Ctrl+O, Enter para guardar y Ctrl+X para salir).
+
+Reinicia el servicio de PostgreSQL para que los cambios surtan efecto:
+
+    sudo service postgresql restart
+
+2. Verifica la configuración en pg_hba.conf
+
+Asegúrate de que el archivo pg_hba.conf esté configurado correctamente para aceptar conexiones mediante autenticación md5 para el usuario dev, como lo has hecho:
+
+local   all             dev                                     md5
+
+Esta configuración es correcta para permitir conexiones locales para el usuario dev utilizando la contraseña.
+3. Intentar nuevamente la conexión
+
+Ahora, si has configurado el puerto a 5432, intenta conectarte nuevamente con:
+
+psql -U dev -d laravel
+
+Si configuraste el puerto a 5433, usa:
+
+psql -U dev -d laravel -p 5433
+
+Esto debería permitirte conectarte correctamente a la base de datos.
+
+
+
+
+Parece que no permite utilizar el puerto 5432 por lo que dejamos con el puerto 5433 y lo agregamos en la conexion con la base de datos
+
+
+
+	$ psql -U dev -d laravel -p 5433
+
+
+He configuracion a mi usuario dev en el archivo 
+sudo nano /etc/postgresql/15/main/pg_hba.conf
+
+Agregando la linea 
+local   all             dev                                     password
+
+Reinicie la base de datos 
+ sudo service postgresql restart
+
+Pero al intentar conectarme nuevamente con mi usuario dev:
+
+ psql -U dev -d laravel -p 5433
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5433" failed: FATAL:  Peer authentication failed for user "dev"
+ChatGPT dijo:
+ChatGPT
+
+El error "Peer authentication failed for user 'dev'" indica que PostgreSQL está intentando autenticar al usuario dev mediante el método Peer, que compara el nombre del usuario del sistema operativo con el nombre del usuario de la base de datos. Sin embargo, como dev es un usuario de base de datos y no coincide con el usuario del sistema operativo, la autenticación falla.
+Solución
+
+Para solucionar este problema, debes configurar PostgreSQL para que use el método de autenticación password (o md5) para conexiones locales del usuario dev, no peer. Aquí están los pasos para hacerlo:
+1. Modificar el archivo pg_hba.conf
+
+Ya agregaste la línea para permitir la autenticación con contraseña, pero asegúrate de que esté configurada correctamente. El archivo pg_hba.conf debería tener algo así:
+
+local   all             dev                                     md5
+
+Esta línea indica que para el usuario dev y cualquier base de datos local, PostgreSQL usará la autenticación md5 (que requiere la contraseña) en lugar de peer.
+2. Reiniciar PostgreSQL
+
+Después de hacer esta modificación, asegúrate de reiniciar PostgreSQL para que los cambios surtan efecto:
+
+sudo service postgresql restart
+
+3. Verificar el puerto y la configuración de PostgreSQL
+
+Asegúrate de que el puerto que estás usando en la conexión sea el correcto (en tu caso, parece ser el 5433).
+4. Intentar la conexión nuevamente
+
+Ahora intenta conectarte de nuevo con el usuario dev:
+
+psql -U dev -d laravel -p 5433
+
+Esto debería funcionar sin el error de autenticación Peer, ya que se está utilizando la autenticación con contraseña (md5).
+5. Configurar pg_hba.conf para otras conexiones (si es necesario)
+
+Si también necesitas permitir conexiones remotas o conexiones TCP/IP, asegúrate de que el archivo pg_hba.conf esté configurado adecuadamente para esos casos. Por ejemplo:
+
+host    all             dev             127.0.0.1/32            md5
+host    all             dev             ::1/128                 md5
+
+Esto permite que el usuario dev se conecte desde cualquier cliente local (127.0.0.1 para IPv4 y ::1 para IPv6) usando autenticación con contraseña (md5).
+
+Reinicia PostgreSQL después de cualquier cambio en la configuración.
+Resumen de pasos
+
+    Cambia el método de autenticación de peer a md5 para el usuario dev en pg_hba.conf.
+    Reinicia PostgreSQL con sudo service postgresql restart.
+    Conéctate a la base de datos usando el comando psql -U dev -d laravel -p 5433.
+
+Esto debería permitirte acceder correctamente a la base de datos con el usuario dev.
+
+
+
+
+
+
+3. Cambia al usuario postgres creado o bien sigamos con el usuario estandar.
+
+Una vez que PostgreSQL esté instalado, intenta cambiar al usuario postgres con este comando:
+
+	$ sudo -i -u postgres
+
+Esto te permitirá acceder como el usuario postgres. Desde aquí, puedes ingresar a la consola de PostgreSQL con:
+
+	$ psql
+
+4. Configura una contraseña para el usuario postgres
+
+Si quieres establecer una contraseña para el usuario postgres y poder usarla para conectar desde Laravel o pgAdmin, ejecuta lo siguiente dentro de la consola de psql:
+
+	ALTER USER postgres PASSWORD 'tu_contraseña_segura';
+
+Reemplaza 'tu_contraseña_segura' con la contraseña que desees.
+
+5. Configura el archivo .env de Laravel
+
+Con PostgreSQL y el usuario postgres configurados, actualiza tu archivo .env en Laravel con las credenciales:
+
+DB_CONNECTION=pgsql
+DB_HOST=localhost
+DB_PORT=5432
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=desarrollo
+
+
+Para el caso del equipo dell Alienware, la configuracion del servidor de la BD quedo de la siguiente manera:
+
+DB_CONNECTION=pgsql
+DB_HOST=localhost
+DB_PORT=5432
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=
+
+REDIS_PASSWORD=cache
+
+
+6. Inicia el servicio de PostgreSQL (si es necesario)
+
+Si PostgreSQL no está ejecutándose automáticamente, puedes iniciarlo con:
+
+sudo service postgresql start
+
+Esto debería permitirte conectarte a PostgreSQL en WSL2 y administrar la base de datos desde Laravel y pgAdmin.
+
+
+Para nuestro caso ejecutamos:
+
+psql -U dev -d laravel -p 5433
+Password for user dev:
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+laravel=>
+
+Lo cual indica que estamos dentro de la BD

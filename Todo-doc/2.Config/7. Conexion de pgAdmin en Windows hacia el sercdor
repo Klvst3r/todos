@@ -1,0 +1,139 @@
+7. Conexion de pgAdmin en Windows hacia el sercdor Postgresql en Debian 12 con WSL2
+
+Para el caso de la computadora con Debian WSL en Dell Alienware no fue necesaria la siguiente configuración, simplemente quedo con la instalacion inicial.
+
+Quedando los parametros de conexión de la siguiente manera en PdAdmin:
+
+ID: 1
+Name: Debian
+Sartver Type: PostgreSQL
+Versión: Post-greSQL 13.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20240309) 13.2.1.20240309, 64 bit
+
+
+
+Conection:
+Conection String: host: 172.29.160.107 port=5432 dbname=laravel user=root connect_timeout=10 sslmod=prefer
+Host name/address: 172.29.160.107
+Port: 5432
+Maintance database: laravel
+Username: root
+
+
+Para conectarte a PostgreSQL en WSL2 desde PgAdmin en Windows, debes configurar PostgreSQL para aceptar conexiones desde la IP de tu máquina Windows y asegurar que el servicio de PostgreSQL esté escuchando en todas las interfaces de red. A continuación te explico los pasos:
+
+
+Paso 1: Configurar PostgreSQL para aceptar conexiones remotas
+
+    Editar el archivo postgresql.conf para escuchar en todas las interfaces:
+
+    En WSL2, abre el archivo de configuración de PostgreSQL:
+
+sudo nano /etc/postgresql/15/main/postgresql.conf
+
+Busca la línea que empieza con listen_addresses y asegúrate de que esté configurada así:
+
+    listen_addresses = '*'
+
+Esto permite que PostgreSQL escuche en todas las interfaces, incluyendo la IP de WSL2.
+
+Guardar y cerrar el archivo.
+
+
+
+Paso 2: Configurar pg_hba.conf para permitir conexiones remotas
+
+    Edita el archivo pg_hba.conf:
+
+sudo nano /etc/postgresql/15/main/pg_hba.conf
+
+Agrega una línea para permitir que el usuario dev se conecte desde la IP de Windows o cualquier otra IP de tu red local. Suponiendo que estás en la misma red, puedes usar el rango de IP 0.0.0.0/0 o la IP específica de tu máquina Windows (por ejemplo, 192.168.x.x):
+
+host    all             dev             0.0.0.0/0               md5
+
+Esta línea permite que el usuario dev se conecte desde cualquier IP, pero si quieres limitarlo a la IP específica de Windows, reemplaza 0.0.0.0/0 con la IP de tu máquina Windows.
+
+Guardar y cerrar el archivo.
+
+Reiniciar PostgreSQL para aplicar los cambios:
+
+    $ sudo service postgresql restart
+
+
+
+Paso 3: Obtener la IP de WSL2 y asegurarse de que esté disponible
+
+En WSL2, obtén la IP de Debian con el comando ifconfig o ip addr show y confirma que es 172.22.109.99. Asegúrate de que tu sistema Windows pueda alcanzar esta IP.
+Paso 4: Configurar PgAdmin para conectarse a PostgreSQL en WSL2
+
+    Abre PgAdmin en Windows.
+
+    Crea un nuevo servidor en PgAdmin:
+        Nombre del servidor: Pon un nombre que identifique la conexión.
+        Host: Usa la IP de WSL2 (172.22.109.99).
+        Puerto: Usa el puerto de PostgreSQL, que normalmente es 5433. (Que es la que se configuro en el archivo del servidor PostgreSQL)
+        Mantenimiento/Database: Especifica el nombre de tu base de datos (por ejemplo, laravel).
+        Username: El usuario que creaste en PostgreSQL, en este caso dev.
+        Password: La contraseña que asignaste a dev.
+
+    Guarda la configuración y conecta el servidor.
+
+
+
+Nota importante
+
+En algunas configuraciones de red de WSL2, puede ser necesario abrir el puerto en el firewall de Windows o ajustar la configuración de red para permitir tráfico entre Windows y WSL2.
+
+Con estos pasos, deberías poder conectar PgAdmin a PostgreSQL en WSL2.
+Dijiste:
+
+
+Solución del error de configuración de la conexion externa con la base de datos
+------------------------------------------------------------------------------
+Me genero este error: sudo service postgresql restart
+Restarting PostgreSQL 15 database server: mainError: /usr/lib/postgresql/15/bin/pg_ctl /usr/lib/postgresql/15/bin/pg_ctl start -D /var/lib/postgresql/15/main -l /var/log/postgresql/postgresql-15-main.log -s -o  -c config_file="/etc/postgresql/15/main/postgresql.conf"  exited with status 1:
+2024-11-10 09:07:06.144 CST [80015] LOG:  starting PostgreSQL 15.8 (Debian 15.8-0+deb12u1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
+2024-11-10 09:07:06.145 CST [80015] LOG:  listening on IPv4 address "0.0.0.0", port 5433
+2024-11-10 09:07:06.145 CST [80015] LOG:  listening on IPv6 address "::", port 5433
+2024-11-10 09:07:06.147 CST [80015] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5433"
+2024-11-10 09:07:06.152 CST [80015] LOG:  invalid authentication method "0.0.0.0/0"
+2024-11-10 09:07:06.152 CST [80015] CONTEXT:  line 96 of configuration file "/etc/postgresql/15/main/pg_hba.conf"
+2024-11-10 09:07:06.153 CST [80015] FATAL:  could not load pg_hba.conf
+2024-11-10 09:07:06.154 CST [80015] LOG:  database system is shut down
+pg_ctl: could not start server
+Examine the log output. ... failed!
+ failed!
+ChatGPT dijo:
+ChatGPT
+
+El error se debe a una configuración incorrecta en el archivo pg_hba.conf. En la línea que añadiste para permitir conexiones remotas, parece que hubo un problema con el parámetro de autenticación.
+
+Revisa esta línea:
+
+host    all             dev             0.0.0.0/0               md5
+
+Confirma que está correctamente escrita. A continuación, te explico los pasos para corregir el archivo.
+
+
+Pasos para corregir el archivo pg_hba.conf
+
+    Abre nuevamente el archivo de configuración:
+
+	$ sudo nano /etc/postgresql/15/main/pg_hba.conf
+
+Verifica que la línea mencionada esté exactamente de esta forma:
+
+    host    all             dev             0.0.0.0/0               md5
+
+    Si por algún motivo quieres permitir conexiones solo desde la IP de tu máquina Windows, podrías reemplazar 0.0.0.0/0 por la IP específica de Windows.
+
+    Asegúrate de que no haya caracteres extra o comillas alrededor de 0.0.0.0/0.
+
+Guarda el archivo y cierra el editor.
+
+Reiniciar PostgreSQL
+
+Después de hacer la corrección, intenta reiniciar el servicio de PostgreSQL nuevamente:
+
+	$ sudo service postgresql restart
+
+Si el problema persiste, revisa el archivo de registro /var/log/postgresql/postgresql-15-main.log para ver mensajes adicionales sobre posibles errores.

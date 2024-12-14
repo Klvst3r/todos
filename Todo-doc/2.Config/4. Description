@@ -1,0 +1,38 @@
+    If you're tired of long courses and just want to learn basic web development this course is for you. This course was built with the goal of teaching the students how to use Laravel and Vue Electron. It focuses heavily on designing a backend RESTful Web Service with CRUD functionality that sends data to a Vue Front End Application.  This is an entry-level course that focuses on building and reinforcing some of the techniques used by developers to build a full-stack application.
+
+
+    In this course, we start by learning what tools you need to create a full-stack Before taking this course, it is recommended that you have an understanding of skills such as Javascript, PHP, Basic SQL, or ORM development. If not we'll touch on some of those topics early in the course but it is still recommended to have a better understanding.
+
+
+    When going through this course you may come across subjects that you are familiar with as well as those that are completely new to you.
+
+
+    Some of the topics touched upon include
+
+        Vue Functional Components
+
+        HTTP Requests with Fetch
+
+        CRUD Methods
+
+        Laravel
+
+        Database Migrations
+
+        ORMs
+
+    When taking this course, please know that you can take your time because you will get access to support along the way. By the time you finish this course, you should feel comfortable creating a full-stack web application with Vue Electron and Laravel.
+    What you’ll learn
+
+        The student will learn the basics of RESTful API development with Laravel
+        How to create a Full Stack Todo List Application
+        Learn how to use the Eloquent ORM
+        Learn to consume JSON with Vue Electron
+
+    Are there any course requirements or prerequisites?
+
+        Be familiar with Laravel
+
+    Who this course is for:
+
+        This course is for entry level web developers that have an understanding of web applications

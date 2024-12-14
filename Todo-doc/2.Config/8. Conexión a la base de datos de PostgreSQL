@@ -1,0 +1,10 @@
+8. Conexión a la base de datos de PostgreSQL
+
+Para conectarnos a nuestra base de datos empleamos el siguiente comando:
+
+	$ psql -U dev -d laravel -p 5433
+		Password for user dev:
+		psql (15.8 (Debian 15.8-0+deb12u1))
+		Type "help" for help.
+
+	laravel=>

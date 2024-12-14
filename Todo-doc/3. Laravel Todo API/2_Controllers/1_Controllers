@@ -1,0 +1,46 @@
+1_Controllers
+
+Si recordamos tenemos un archivlo llamados
+	kool.yml
+
+Contiene los comandos que se puede ejecutar con la herramienta kool
+
+Ya se creo la migracion con el siguiente comando:
+	kkol run artisan make:model Todo --migration
+
+Ahora vamos al tema de los controladores
+
+Ahora que tenemos ya nuestro modelo que se conecta con la BD, el siguiente paso es la creación del controlador
+	kool run artisan make:controller API/TodoController --api
+
+Esto genrara el API Controller.
+Creando una subcarpeta llama API y dentro el controlador
+
+
+Tenemos propiedades, index, show, store, update, destory.
+
+ahora vamos a la carpeta de la BD en la carpeta de rutas y vamos a configurar nuestro archivo
+	api.php
+
+
+con el Request respectivo.
+
+Importamos el controlador
+	use App\Http\Controllers\API\TodoController;
+
+Definimos nuestra ruta del API Controller
+	Route::apiResource('todos', TodoController::class);
+
+
+Debemos asegurarnos que tenemos acceso a la rutas, asi que ejecutamos:
+	$ kool run artisan route:list
+
+  GET|HEAD   / .......................................................................................................
+  POST       _ignition/execute-solution ignition.executeSolution › Spatie\LaravelIgnition › ExecuteSolutionController
+  GET|HEAD   _ignition/health-check ............ ignition.healthCheck › Spatie\LaravelIgnition › HealthCheckController
+  POST       _ignition/update-config ......... ignition.updateConfig › Spatie\LaravelIgnition › UpdateConfigController
+  GET|HEAD   api/user ................................................................................................
+  GET|HEAD   sanctum/csrf-cookie ................... sanctum.csrf-cookie › Laravel\Sanctum › CsrfCookieController@show
+
+
+Aqui tenemos las rutas de nuestra API

@@ -1,0 +1,37 @@
+ kool create laravel todos
+Creating new laravel project...
+⇒ Creating new Laravel Application
+? Which PHP version do you want to use? PHP 8.1
+⇒ PHP 8.1
+→ exec: docker pull -q kooldev/php:8.1
+docker.io/kooldev/php:8.1
+→ exec: kool docker kooldev/php:8.1 composer create-project --no-install --no-scripts --prefer-dist laravel/laravel todos
+Creating a "laravel/laravel" project at "./todos"
+Cannot use laravel/laravel's latest version v11.3.2 as it requires php ^8.2 which is not satisfied by your platform.
+Installing laravel/laravel (v10.3.3)
+  - Downloading laravel/laravel (v10.3.3)
+  - Installing laravel/laravel (v10.3.3): Extracting archive
+Created project in /app/todos
+Initializing laravel preset...
+⇒ Copy basic config files
+→ copying docker-compose.yml
+→ copying kool.yml
+→ copying vite.config.js
+File vite.config.js already exists, overriding. (backup is vite.config.js.bak.20241108)
+→ merging scripts/laravel.yml into kool.yml
+⇒ Customize your setup
+→ Already selected 'Which PHP version do you want to use?': PHP 8.1
+⇒ PHP 8.1
+→ merging app/php81.yml into docker-compose.yml
+? Which database service do you want to use PostgreSQL 13.0
+⇒ PostgreSQL 13.0
+→ merging database/postgresql13.yml into docker-compose.yml
+→ merging scripts/postgresql.yml into kool.yml
+? Which cache service do you want to use Redis 7.0
+⇒ Redis 7.0
+→ merging cache/redis7.yml into docker-compose.yml
+? Which Javascript package manager do you want to use npm
+⇒ npm
+→ merging scripts/npm-laravel.yml into kool.yml
+→ merging misc/npm-vitejs.yml into docker-compose.yml
+Preset laravel created successfully!

@@ -1,0 +1,54 @@
+1. Agregar nuestro Request del Request de la API de Laravel
+
+Ahora que tenemos la configuración de controlador, podemos 
+
+Vayamos a nuestro controlador y empezams cunetro metodo store
+
+	 public function store(Request $request)
+    {
+        $todo = Todo::create($request->all());
+        return response()->json($todo, 200);
+    }
+
+Lo siquigete que vamos a hacer es retornar un response JSON todo in 200;
+
+nos indica un error, asi que debemos importar en la parte inicial
+
+Importar el modelo 
+	use App\Models\Todo;	
+
+
+Para ver como trabaja el APi de nuestro TODO vamos ainstalar el SW Insomnia
+
+	https://insomnia.rest/download
+
+Aunque estamos utilizando windows podemos descargarlo para otros sistemas operativos:
+
+
+	https://github.com/Kong/insomnia/releases/tag/core@10.2.0
+
+
+Accesando a Laravel Todos
+
+	htto://localhost/api/todos
+
+
+En el archiovo de configuracion .env utilizamos los siguientes parametros
+
+DB_CONNECTION=pgsql
+DB_HOST=172.22.109.99
+DB_PORT=5433
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=desarrollo
+
+y en el archivo docker-compose.yml
+database:
+    image: postgres:13-alpine
+    ports:
+      - "${KOOL_DATABASE_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: "${DB_DATABASE-database}"
+      POSTGRES_USER: "${DB_USERNAME-user}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD-pass}"
+      POSTGRES_HOST_AUTH_METHOD: "trust"

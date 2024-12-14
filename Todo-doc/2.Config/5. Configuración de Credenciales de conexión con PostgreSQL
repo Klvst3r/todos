@@ -1,0 +1,34 @@
+5. Configuración de Credenciales de conexión con la BD de PostgreSQL
+
+Para conectar tu aplicación con PostgreSQL en el entorno de desarrollo, y poder visualizar la base de datos en pgAdmin, necesitas:
+
+    Configurar las credenciales de conexión en el archivo .env de Laravel (parece que ya tienes la configuración básica en el fragmento que compartiste). Sin embargo, los valores de DB_USERNAME y DB_PASSWORD deben coincidir con un usuario existente en PostgreSQL.
+
+    Crear un usuario en PostgreSQL que tenga permisos de acceso a la base de datos:
+
+    Puedes hacer esto desde una terminal o desde tu cliente de PostgreSQL. A continuación, se muestra cómo crear un usuario y asignar permisos desde la terminal de PostgreSQL:
+
+sudo -u postgres psql
+
+Luego, ejecuta los siguientes comandos en la consola de PostgreSQL para crear el usuario root con una contraseña:
+
+    CREATE USER root WITH PASSWORD 'tu_contraseña_segura';
+    ALTER ROLE root SET client_encoding TO 'utf8';
+    ALTER ROLE root SET default_transaction_isolation TO 'read committed';
+    ALTER ROLE root SET timezone TO 'UTC';
+    GRANT ALL PRIVILEGES ON DATABASE laravel TO root;
+
+    Asegúrate de reemplazar 'tu_contraseña_segura' con una contraseña que tú elijas.
+
+    Configurar pgAdmin para acceder a PostgreSQL:
+        Abre pgAdmin y agrega un nuevo servidor.
+        En la pestaña "Connection":
+            Host name/address: El nombre o dirección IP de tu servidor PostgreSQL (si está en Docker, usa el nombre de servicio configurado como database o su IP).
+            Port: 5432.
+            Maintenance database: postgres.
+            Username: root.
+            Password: la contraseña que configuraste para root.
+
+    Verificar la conexión desde pgAdmin: Una vez configurado el servidor en pgAdmin, intenta conectarte. Deberías poder ver la base de datos laravel y sus tablas.
+
+Si tienes PostgreSQL corriendo en Docker, verifica también que el contenedor esté configurado para aceptar conexiones externas y que el puerto 5432 esté mapeado correctamente.

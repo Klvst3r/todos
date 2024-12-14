@@ -1,0 +1,115 @@
+3. Comandos en contenedores Docker.
+
+Utiliza
+	$ kool exec
+Para ejecutar comandos dentro de los servicios de contenedores
+
+	# kool exec [OPTIONS] SERVICE COMMAND [--] [ARG...]
+
+	$ kool exec app ls
+
+Intenta ejecutar:
+	kool run artisan --help 
+
+Para ejecutar la aplicacion del comando
+	$ kool exec app php artisan --help 
+
+en la ejecuacion de nuestra app y poder imprimir nuestra información de os comandos CLI de Laravel
+	
+Abrir sesione en los contenedores de Docker
+-----------------------------------------------
+De manera simialr  a ssh, si se quiere abrir una sesion bash en nuestro contenedor de la  aplicación app, ejecutemos
+	$ kool exec app bash
+
+Donde:
+	- app es el nombre de nuestro servicio del contenedor en el archivo docker-compose.yml
+
+Si se prefiere se puede usar sh in lugar de bash
+	Ej.
+		kool exec app sh
+
+comanods:
+	$ kool exec app bash
+	bash-5.1#
+
+	$ kool exec app sh
+	/app #
+
+
+Conectar al contenedor de docker de la Base de datos
+-----------------------------------------------
+
+Ahora se puede iniciar de manera facil una nueva sesion de cleinte SQL dentro de la ejecución dentro del contenedor de la  database ejecutando
+	$ kool run mysql  (MySQL)
+
+o
+	$ kool run psql	(PostgreSQL)
+
+En nuestra terminal. Esto ejecutara una script simple en una linea de mysql o psqlincluido en nuestro kool.yml
+
+
+
+Acceso a Repositorios providaos y Paquetes en contenedores de Docker
+-----------------------------------------------
+
+Si se necesita que nuestra contenedor de la app use las llaves locales SSH para repositorios provados y o instalara paquetes privados (los cuales han sido añadidos como dependencias en nuestro archivo (composer.json) o package.json simplemente se puede agregar:
+	
+	$HOME/.ssh:/home/kool/.ssh:delegated
+
+Debajo de las llaves de volumenes del servicio de la app en nuestro archivo docker-compose.yml. Esto mapea a nuestra carpeta .ssh en el contenedor de la carpeta .ssh en nuestra maquina host
+	volumes:
+	  - .:/app:delegated
+	+ - $HOME/.ssh:/home/kool/.ssh:delegated
+
+
+
+Permanecer Kool
+-----------------------------------------------
+
+Cuando sea tiempo de detener el trabajo de nuestri proyecto podremos hacer
+	$ kool stop
+
+	y entonces cuando estemos listos para trabajar nuevamente
+		$ kool start
+
+Se tienen mas presets para ayudar a iniciar el proyecto con kool de una via estandarizada cruzando diferentes frameworks
+
+	AdonisJs
+		https://kool.dev/docs/03-Presets/AdonisJs.md
+
+	CodeIgniter
+		https://kool.dev/docs/03-Presets/CodeIgniter.md
+
+	Express.js
+		https://kool.dev/docs/03-Presets/ExpressJS.md
+
+	Hugo
+		https://kool.dev/docs/03-Presets/Hugo.md
+
+	NestJS
+		https://kool.dev/docs/03-Presets/NestJS.md
+
+	Next.js
+		https://kool.dev/docs/03-Presets/NextJS.md
+
+	Node.js
+		https://kool.dev/docs/03-Presets/NodeJS.md
+
+	Nuxt.js
+		https://kool.dev/docs/03-Presets/NuxtJS.md
+
+	PHP
+		https://kool.dev/docs/03-Presets/PHP.md
+
+	Symfony
+		https://kool.dev/docs/03-Presets/Symfony.md
+
+	WordPress
+		https://kool.dev/docs/03-Presets/WordPress.md
+
+En caso de requerir o generar u nuevo preset se puede contribuir en:
+		 https://github.com/kool-dev/kool/tree/main/presets
+
+Ahi podremos visualizar el codigo y aprender mas sobre como trabajan los presets
+
+		 

@@ -1,0 +1,279 @@
+10. Permiso del usuario dev en PostgreSQL
+
+Al ejecutar la migración geera el siguiente error:
+
+kool run artisan migrate
+
+   INFO  Preparing database.
+
+  Creating migration table ................................................................................................................ 6ms FAIL
+
+   Illuminate\Database\QueryException
+
+  SQLSTATE[42501]: Insufficient privilege: 7 ERROR:  permission denied for schema public at character 14 (Connection: pgsql, SQL: create table "migrations" ("id" serial not null primary key, "migration" varchar(255) not null, "batch" integer not null))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+    825▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕                 );
+    827▕             }
+    828▕
+  ➜ 829▕             throw new QueryException(
+    830▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831▕             );
+    832▕         }
+    833▕     }
+
+      +39 vendor frames
+
+  40  artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+exit status 1
+
+
+
+El error indica que el usuario dev no tiene permisos suficientes para crear tablas en el esquema public. Esto puede solucionarse otorgando los permisos adecuados a ese usuario en la base de datos. A continuación, se muestra cómo hacerlo:
+
+    Inicia sesión en PostgreSQL como el usuario administrador (usualmente postgres):
+
+psql -U postgres -d laravel
+
+Devido a que nos genera el siguiente error:
+
+ psql -U postgres -d laravel
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5433" failed: FATAL:  Peer authentication failed for user "postgres"
+
+Vamos a hacer la conexion son el usperusuario sudo
+
+ sudo -u postgres psql
+[sudo] password for klvst3r:
+could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+postgres=#
+
+
+Otrogar permisos al usuario dev
+----------------------------------
+Otorga permisos al usuario dev para crear tablas en el esquema public:
+
+GRANT ALL PRIVILEGES ON SCHEMA public TO dev;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO dev;
+
+Si el problema persiste, también puedes intentar asignar permisos en la base de datos completa:
+
+GRANT ALL PRIVILEGES ON DATABASE laravel TO dev;
+
+Vuelve a ejecutar la migración:
+
+    kool run artisan migrate
+
+Esto debería resolver el problema de permisos y permitir que Laravel ejecute las migraciones correctamente.
+
+
+La ejecucion fue la siguiente:
+
+psql -U postgres -d laravel
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5433" failed: FATAL:  Peer authentication failed for user "postgres"
+klvst3r@rog:~/dev/todo/todos$ sudo -u postgres psql
+[sudo] password for klvst3r:
+could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+postgres=# GRANT ALL PRIVILEGES ON SCHEMA public TO dev;
+GRANT
+postgres=# ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO dev;
+ALTER DEFAULT PRIVILEGES
+postgres=#
+
+--------------
+
+Intentamos ejecutar la migración nuevamente pero nos genero aun un error:
+ kool run artisan migrate
+
+   INFO  Preparing database.
+
+  Creating migration table ................................................................................................................ 3ms FAIL
+
+   Illuminate\Database\QueryException
+
+  SQLSTATE[42501]: Insufficient privilege: 7 ERROR:  permission denied for schema public at character 14 (Connection: pgsql, SQL: create table "migrations" ("id" serial not null primary key, "migration" varchar(255) not null, "batch" integer not null))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+    825▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕                 );
+    827▕             }
+    828▕
+  ➜ 829▕             throw new QueryException(
+    830▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831▕             );
+    832▕         }
+    833▕     }
+
+      +39 vendor frames
+
+  40  artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+
+Este error indica que el usuario dev aún no tiene suficientes permisos en el esquema public, específicamente para crear tablas. Para solucionarlo, asegurémonos de que el usuario dev tenga privilegios completos en la base de datos laravel y en el esquema public. A continuación se detallan los pasos adicionales para confirmar y otorgar estos permisos.
+
+    Inicia sesión en PostgreSQL como el usuario postgres (administrador):
+
+sudo -u postgres psql
+
+Otorga todos los privilegios en la base de datos laravel al usuario dev:
+
+GRANT ALL PRIVILEGES ON DATABASE laravel TO dev;
+
+Otorga permisos explícitos para crear y administrar objetos en el esquema public al usuario dev:
+
+GRANT ALL ON SCHEMA public TO dev;
+ALTER ROLE dev SET search_path = public;
+
+Otorga privilegios por defecto en todas las tablas nuevas creadas en el esquema public para el usuario dev:
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO dev;
+
+Sal de la sesión de PostgreSQL:
+
+\q
+
+Ejecuta nuevamente la migración:
+
+    kool run artisan migrate
+
+Estos pasos deberían asegurar que dev tenga los permisos necesarios para ejecutar las migraciones de Laravel en la base de datos laravel.
+
+
+La ejecución ahora fue:
+
+ $ sudo -u postgres psql
+	could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+	psql (15.8 (Debian 15.8-0+deb12u1))
+	Type "help" for help.
+
+	postgres=# GRANT ALL PRIVILEGES ON DATABASE laravel TO dev;
+	GRANT
+	postgres=# GRANT ALL ON SCHEMA public TO dev;
+	GRANT
+	postgres=# ALTER ROLE dev SET search_path = public;
+	ALTER ROLE
+	postgres=# ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO dev;
+	ALTER DEFAULT PRIVILEGES
+	postgres=# \q
+
+
+
+Pero al realizar nuevamente el intento de migracion
+
+Relice el proceso descrito anteriormente y ejecuto la miración ahora con la siguiente salida:
+
+ kool run artisan migrate
+
+   INFO  Preparing database.
+
+  Creating migration table ................................................................................................................ 6ms FAIL
+
+   Illuminate\Database\QueryException
+
+  SQLSTATE[42501]: Insufficient privilege: 7 ERROR:  permission denied for schema public at character 14 (Connection: pgsql, SQL: create table "migrations" ("id" serial not null primary key, "migration" varchar(255) not null, "batch" integer not null))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+    825▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕                 );
+    827▕             }
+    828▕
+  ➜ 829▕             throw new QueryException(
+    830▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831▕             );
+    832▕         }
+    833▕     }
+
+      +39 vendor frames
+
+  40  artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+
+
+Dado que el problema persiste con los permisos en el esquema public, revisemos algunos puntos adicionales para asegurarnos de que el usuario dev tenga los privilegios adecuados.
+
+A continuación, te doy un conjunto de comandos adicionales y algunos detalles específicos para solucionar el problema:
+
+    Asegúrate de que el usuario dev tenga permisos de creación en el esquema public:
+
+GRANT CREATE ON SCHEMA public TO dev;
+
+Otorga permisos de uso en el esquema public:
+
+GRANT USAGE ON SCHEMA public TO dev;
+
+Otorga permisos de administración en todas las tablas existentes del esquema public:
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO dev;
+
+Otorga permisos de administración en todas las secuencias en el esquema public, necesarios para manejar columnas de tipo serial:
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO dev;
+
+Verifica los permisos actuales del usuario dev en el esquema public con el siguiente comando, ejecutado en la sesión de PostgreSQL:
+
+\dn+ public
+
+Ejecuta nuevamente la migración:
+
+    kool run artisan migrate
+
+Después de realizar estos pasos, el usuario dev debería tener los permisos completos necesarios para crear y administrar tablas y secuencias en el esquema public.
+
+
+
+ejecución
+ $ sudo -u postgres psql
+could not change directory to "/home/klvst3r/dev/todo/todos": Permission denied
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+postgres=# GRANT CREATE ON SCHEMA public TO dev;
+GRANT
+postgres=# GRANT USAGE ON SCHEMA public TO dev;
+GRANT
+postgres=# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO dev;
+GRANT
+postgres=# GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO dev;
+GRANT
+postgres=# \dn+ public
+                                       List of schemas
+  Name  |       Owner       |           Access privileges            |      Description
+--------+-------------------+----------------------------------------+------------------------
+ public | pg_database_owner | pg_database_owner=UC/pg_database_owner+| standard public schema
+        |                   | =U/pg_database_owner                  +|
+        |                   | dev=UC/pg_database_owner               |
+(1 row)
+
+La salida que compartiste indica que el usuario dev tiene permisos de "USAGE" (U) y "CREATE" (C) en el esquema public, pero no parece tener privilegios suficientes para ejecutar ciertas operaciones necesarias durante la migración en Laravel, como la creación de tablas o la gestión de secuencias.
+
+Para que el usuario dev pueda realizar migraciones, debe contar con permisos más amplios en el esquema. Específicamente, necesita tener privilegios de todos los tipos en todas las tablas y secuencias de public. Aquí te dejo los comandos SQL para otorgar estos permisos adicionales:
+
+    Otorga todos los permisos en todas las tablas y secuencias del esquema public:
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO dev;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO dev;
+
+Asegura que el usuario tenga permisos predeterminados en el esquema para tablas y secuencias futuras (esto afecta todas las tablas y secuencias que Laravel intentará crear en el futuro):
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO dev;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO dev;
+
+Verifica los permisos nuevamente usando el comando:
+
+\dp public.*
+
+Ejecuta la migración nuevamente:
+
+    kool run artisan migrate
+
+Con estos permisos adicionales, el usuario dev debería poder ejecutar todas las operaciones necesarias en el esquema public sin problemas.

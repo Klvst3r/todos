@@ -1,0 +1,558 @@
+13. Comandos Ejecutados:
+
+Efectivos:
+430  kool start
+
+1. Open Docker Deskktop
+2. Start images
+3. Begin Debian terminal
+4. chang directory project
+    $ cd dev
+    $ ls
+    $ cd todo/
+    $ cd todos/
+
+5. Start Tool dev
+    $  kool --version
+    $  kool start
+
+6. Start DB  
+    $ kool run psql
+
+7. Try login
+    $  sudo -u postgres psql
+    $  psql --version
+    $  sudo -u postgres psql
+    $  sudo -i -u postgres
+
+8. Config if need config
+    $ sudo nano /etc/postgresql/*/main/postgresql.conf
+    $ sudo service postgresql restart
+    $ sudo nano /etc/postgresql/*/main/postgresql.conf
+    $ sudo service postgresql restart
+  
+9 Log in DB
+   $ psql -p 5433 -U postgres
+
+10. Log in like dev user   
+    $ psql -p 5433 -U dev
+    $ psql -p 5433 -U laravel
+  
+    $ clear
+
+11. Try to force log in like root
+  $ psql -p 5433 -U root
+
+12. Log in deb user  
+  $ psql -p 5433 -U dev
+
+  Funcional
+  
+  $ psql -U dev -d laravel
+  469  history 250
+
+
+ history 250
+  186  git status
+  187  git add .
+  188  git commit -m "package json2
+  189  git commit -m "package json"
+  190  git push origin master
+  191  git pull
+  192  git config pull.rebase true
+  193  git status
+  194  git pull
+  195  git rebase ..continue
+  196  git rebase --continue
+  197  git status
+  198  git rebase --skip
+  199  clear
+  200  git status
+  201  clear
+  202  git pull
+  203  clear
+  204  lsb_release
+  205  clear
+  206  ifconfig
+  207  clear
+  208  exit
+  209  cd deb
+  210  cd /dev
+  211  cd simca
+  212  clear
+  213  cd simca
+  214  clear
+  215  ls
+  216  cd hom
+  217  cd /home/
+  218  clear
+  219  ls
+  220  cd klvst3r/
+  221  celar
+  222  clear
+  223  ls
+  224  cd dev/
+  225  clear
+  226  ls
+  227  cd simca/
+  228  clear
+  229  git status
+  230  clear
+  231  git status
+  232  clear
+  233  cd dev/
+  234  clear
+  235  ls
+  236  curl -fsSL https://kool.dev/install | bash
+  237  curl -fsSL https://kool.dev/install
+  238  cd devdoc/
+  239  clear
+  240  subl .
+  241  subl -
+  242  subl .
+  243  clear
+  244  code .
+  245  exit
+  246  cd dev/
+  247  cd todo/
+  248  cd todos/
+  249  clear
+  250  php artisan migrate
+  251  kool run artisan migrate
+  252  sudo kool run artisan migrate
+  253  code .
+  254  exit
+  255  cd dev/
+  256  clear
+  257  ls
+  258  cd odo
+  259  cd todo/
+  260  cear
+  261  clear
+  262  ls
+  263  clear
+  264  kool --version
+  265  kool create laravel todos
+  266  kool create laravel todos --php=8.0
+  267  kool create laravel todos --php=8.1
+  268  kool create laravel todos
+  269  cd todos/
+  270  ls
+  271  code .
+  272  clear
+  273  ls
+  274  cp .env.example .env
+  275  kool run setup
+  276  kool run artisan make:model Todo --migration
+  277  sudo -u postgres psql
+  278  psql --version
+  279  sudo apt update
+  280  sudo apt install postgresql postgresql-contrib
+  281  sudo -u postgres psql
+  282  psql --version
+  283  sudo -i -u postgres
+  284  su
+  285  sudo apt install sudo
+  286  nano /etc/sudoers.d/postgres
+  287  sudo nano /etc/sudoers.d/postgres
+  288  ls /etc/sudoers.d
+  289  sudo cat /etc/sudoers.d
+  290  sudo cat /etc/sudoers.d/postgres
+  291  clear
+  292  sudo -i -u postgres
+  293  sudo service postgresql status
+  294  sudo service postgresql start
+  295  sudo -u postgres psql
+  296  clear
+  297  sudo -i -u dev
+  298  sudo -i -u postgres
+  299  clear
+  300  psql -U dev -d laravel
+  301  sudo -i -u postgres
+  302  clear
+  303  sudo code /etc/postgresql/<versión>/main/pg_hba.conf
+  304  sudo nano /etc/postgresql/<versión>/main/pg_hba.conf
+  305  cd /etc/
+  306  cd postgresql
+  307  ls
+  308  cd 15/
+  309  cd main/
+  310  cd ..
+  311  cd..
+  312  cd.
+  313  cd ..
+  314  cd ~
+  315  clear
+  316  sudo code /etc/postgresql/15/main/pg_hba.conf
+  317  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  318  sudo service postgresql restart
+  319  psql -u dev -d laravel
+  320  psql -U dev -d laravel
+  321  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  322  sudo nano /etc/postgresql/15/main/postgresql.conf
+  323  sudo service postgresql restart
+  324  sudo nano /etc/postgresql/15/main/postgresql.conf
+  325  sudo service postgresql restart
+  326  psql -U dev -d laravel -p 5433
+  327  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  328  sudo service postgresql restart
+  329  psql -U dev -d laravel -p 5433
+  330  sudo nano /etc/postgresql/15/main/pg_hba.conf
+
+Usuario correctos  
+  331  sudo service postgresql restart
+  332  psql -U dev -d laravel -p 5433
+  333  ip -a
+  334  ipconfig
+  335  ifconfig
+  336  clear
+  337  sudo nano /etc/postgresql/15/main/postgresql.conf
+  338  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  339  sudo service postgresql restart
+  340  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  341  sudo service postgresql restart
+  342  ip addr show
+  343  ifconfig
+  344  clear
+  345  cd dev/
+  346  ls
+  347  cd todo/
+  348  clear
+  349  ls
+  350  cd todos/
+  351  clear
+  352  ls
+  353  clear
+  354  kool run artisan migrate
+  355  psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+  356  kool run artisan migrate
+  357  psql -h localhost -p 5433 -U dev -d laravel
+  358  psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+  359  kool run artisan migrate
+  360  ifconfig
+  361  kool run artisan migrate
+  362  psql -U postgres -d laravel
+  363  sudo -u postgres psql
+  364  clear
+  365  kool run artisan migrate
+  366  sudo -u postgres psql
+  367  kool run artisan migrate
+  368  sudo -u postgres psql
+  369  clear
+  370  sudo -u postgres psql
+  371  kool run artisan migrate
+  372  sudo -u postgres psql
+  373  kool run artisan migrate
+  374  ping 172.22.109.99
+  375  clear
+  376  nano /etc/postgresql/15/main/postgresql.conf
+  377  nano /etc/postgresql/15/main/pg_hba.conf
+  378  nano /etc/postgresql/15/main/postgresql.conf
+  379  nano /etc/postgresql/15/main/pg_hba.conf
+  380  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  381  sudo -u postgres psql
+  382  psql -h 172.22.109.99 -U dev -d laravel -p 5433
+  383  clear
+  384  kool run artisan config:cache
+  385  kool run artisan cache:clear
+  386  kool run artisan migrate
+  387  sudo -u postgres psql
+  388  kool run artisan migrate
+  389  cd storage/logs/laravel.log
+  390  cd storage/logs/
+  391  clear
+  392  ñs
+  393  cleara
+  394  clear
+  395  s
+  396  ls
+  397  code laravel.log
+  398  cd ..
+  399  cd .
+  400  cd ..
+  401  clear
+  402  sudo -u postgres psql
+  403  kool run artisan migrate
+  404  sudo -u postgres psqlclar
+  405  clear
+  406  code .
+  407  clear
+  408  sudo -u postgres psqlclar
+  409  clear
+  410  sudo -u postgres psql
+  411  kool run artisan migrate
+  412  kool run artisan migrate:reset
+  413  kool run artisan migrate
+  414  ifconfig
+  415  psql -U dev -d laravel -p 5433
+  416  clear
+  417  psql -h localhost -p 5433 -U dev -d laravel
+  418  psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+  419  sudo -u postgres psql
+  420  psql -U postgres -d laravel
+  421  ifconfig
+  422  kool status
+  423  kool run setup
+  424  cd dev/
+  425  cd todo/
+  426  ls
+  427  cd todos/
+  428  clear
+  429  kool run setup
+  430  kool start
+  431  ifconfig
+
+
+
+
+  Otra terminal
+   220  cd klvst3r/
+  221  celar
+  222  clear
+  223  ls
+  224  cd dev/
+  225  clear
+  226  ls
+  227  cd simca/
+  228  clear
+  229  git status
+  230  clear
+  231  git status
+  232  clear
+  233  cd dev/
+  234  clear
+  235  ls
+  236  curl -fsSL https://kool.dev/install | bash
+  237  curl -fsSL https://kool.dev/install
+  238  cd devdoc/
+  239  clear
+  240  subl .
+  241  subl -
+  242  subl .
+  243  clear
+  244  code .
+  245  exit
+  246  cd dev/
+  247  cd todo/
+  248  cd todos/
+  249  clear
+  250  php artisan migrate
+  251  kool run artisan migrate
+  252  sudo kool run artisan migrate
+  253  code .
+  254  exit
+  255  cd dev/
+  256  clear
+  257  ls
+  258  cd odo
+  259  cd todo/
+  260  cear
+  261  clear
+  262  ls
+  263  clear
+  264  kool --version
+  265  kool create laravel todos
+  266  kool create laravel todos --php=8.0
+  267  kool create laravel todos --php=8.1
+  268  kool create laravel todos
+  269  cd todos/
+  270  ls
+  271  code .
+  272  clear
+  273  ls
+  274  cp .env.example .env
+  275  kool run setup
+  276  kool run artisan make:model Todo --migration
+  277  sudo -u postgres psql
+  278  psql --version
+  279  sudo apt update
+  280  sudo apt install postgresql postgresql-contrib
+  281  sudo -u postgres psql
+  282  psql --version
+  283  sudo -i -u postgres
+  284  su
+  285  sudo apt install sudo
+  286  nano /etc/sudoers.d/postgres
+  287  sudo nano /etc/sudoers.d/postgres
+  288  ls /etc/sudoers.d
+  289  sudo cat /etc/sudoers.d
+  290  sudo cat /etc/sudoers.d/postgres
+  291  clear
+  292  sudo -i -u postgres
+  293  sudo service postgresql status
+  294  sudo service postgresql start
+  295  sudo -u postgres psql
+  296  clear
+  297  sudo -i -u dev
+  298  sudo -i -u postgres
+  299  clear
+  300  psql -U dev -d laravel
+  301  sudo -i -u postgres
+  302  clear
+  303  sudo code /etc/postgresql/<versión>/main/pg_hba.conf
+  304  sudo nano /etc/postgresql/<versión>/main/pg_hba.conf
+  305  cd /etc/
+  306  cd postgresql
+  307  ls
+  308  cd 15/
+  309  cd main/
+  310  cd ..
+  311  cd..
+  312  cd.
+  313  cd ..
+  314  cd ~
+  315  clear
+  316  sudo code /etc/postgresql/15/main/pg_hba.conf
+  317  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  318  sudo service postgresql restart
+  319  psql -u dev -d laravel
+  320  psql -U dev -d laravel
+  321  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  322  sudo nano /etc/postgresql/15/main/postgresql.conf
+  323  sudo service postgresql restart
+  324  sudo nano /etc/postgresql/15/main/postgresql.conf
+  325  sudo service postgresql restart
+  326  psql -U dev -d laravel -p 5433
+  327  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  328  sudo service postgresql restart
+  329  psql -U dev -d laravel -p 5433
+  330  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  331  sudo service postgresql restart
+  332  psql -U dev -d laravel -p 5433
+  333  ip -a
+  334  ipconfig
+  335  ifconfig
+  336  clear
+  337  sudo nano /etc/postgresql/15/main/postgresql.conf
+  338  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  339  sudo service postgresql restart
+  340  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  341  sudo service postgresql restart
+  342  ip addr show
+  343  ifconfig
+  344  clear
+  345  cd dev/
+  346  ls
+  347  cd todo/
+  348  clear
+  349  ls
+  350  cd todos/
+  351  clear
+  352  ls
+  353  clear
+  354  kool run artisan migrate
+  355  psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+  356  kool run artisan migrate
+  357  psql -h localhost -p 5433 -U dev -d laravel
+  358  psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+  359  kool run artisan migrate
+  360  ifconfig
+  361  kool run artisan migrate
+  362  psql -U postgres -d laravel
+  363  sudo -u postgres psql
+  364  clear
+  365  kool run artisan migrate
+  366  sudo -u postgres psql
+  367  kool run artisan migrate
+  368  sudo -u postgres psql
+  369  clear
+  370  sudo -u postgres psql
+  371  kool run artisan migrate
+  372  sudo -u postgres psql
+  373  kool run artisan migrate
+  374  ping 172.22.109.99
+  375  clear
+  376  nano /etc/postgresql/15/main/postgresql.conf
+  377  nano /etc/postgresql/15/main/pg_hba.conf
+  378  nano /etc/postgresql/15/main/postgresql.conf
+  379  nano /etc/postgresql/15/main/pg_hba.conf
+  380  sudo nano /etc/postgresql/15/main/pg_hba.conf
+  381  sudo -u postgres psql
+  382  psql -h 172.22.109.99 -U dev -d laravel -p 5433
+  383  clear
+  384  kool run artisan config:cache
+  385  kool run artisan cache:clear
+  386  kool run artisan migrate
+  387  sudo -u postgres psql
+  388  kool run artisan migrate
+  389  cd storage/logs/laravel.log
+  390  cd storage/logs/
+  391  clear
+  392  ñs
+  393  cleara
+  394  clear
+  395  s
+  396  ls
+  397  code laravel.log
+  398  cd ..
+  399  cd .
+  400  cd ..
+  401  clear
+  402  sudo -u postgres psql
+  403  kool run artisan migrate
+  404  sudo -u postgres psqlclar
+  405  clear
+  406  code .
+  407  clear
+  408  sudo -u postgres psqlclar
+  409  clear
+  410  sudo -u postgres psql
+  411  kool run artisan migrate
+  412  kool run artisan migrate:reset
+  413  kool run artisan migrate
+  414  ifconfig
+  415  psql -U dev -d laravel -p 5433
+  416  clear
+  417  psql -h localhost -p 5433 -U dev -d laravel
+  418  psql -h 127.0.0.1 -p 5433 -U dev -d laravel
+  419  sudo -u postgres psql
+  420  psql -U postgres -d laravel
+  421  ifconfig
+  422  kool status
+  423  kool run setup
+  424  cd dev/
+  425  cd todo/
+  426  ls
+  427  cd todos/
+  428  clear
+  429  kool run setup
+  430  kool start
+  431  cd dev
+  432  ls
+  433  cd todo/
+  434  clear
+  435  ls
+  436  cd todos/
+  437  clear
+  438  ls
+  439  kooñ --version
+  440  kool --version
+  441  kool start
+  442  kool run psql
+  443  clear
+  444  sudo -u postgres psql
+  445  clear
+  446* sudo -u dev p
+  447  sudo -u postgres dev
+  448  clear
+  449  kool run psql
+  450  sudo -u postgres psql
+  451  clear
+  452  sudo -u postgres psql
+  453  clear
+  454  psql --version
+  455  sudo -u postgres psql
+  456  sudo -i -u postgres
+  457  clear
+  458  sudo nano /etc/postgresql/*/main/postgresql.conf
+  459  sudo service postgresql restart
+  460  sudo nano /etc/postgresql/*/main/postgresql.conf
+  461  sudo service postgresql restart
+  462  psql -p 5433 -U postgres
+  463  psql -p 5433 -U dev
+  464  psql -p 5433 -U laravel
+  465  clear
+  466  psql -p 5433 -U root
+  467  psql -p 5433 -U dev
+  468  psql -U dev -d laravel
+  469  history 250

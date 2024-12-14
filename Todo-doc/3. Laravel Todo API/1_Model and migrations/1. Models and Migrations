@@ -1,0 +1,112 @@
+Modelos y Migraciones  de Laravel
+
+El archivo de configuración kool.yml
+
+Si deseamos usar comandos de artisan de php, se pueden hacer corriendo kool y entonces ya artisan
+
+En este archivo se encuentra los comandos para ejecutar la apllicacion de laravel
+
+Asi que desde la consola podemos crear las migraciones.
+
+	$ kool run artisan make:model Todo --migration
+
+Asi se crea el archivo de migracion, en la carpeta de Modelos estara nuestro archivo recien creado.
+
+Dentro de nuestro modelo ahora creamos los campos a llenarse masivamente.
+
+	 protected $fillable = [
+        'title',
+        'completed'
+    ];
+
+Asi dentro de nuestra migración, la cual esta dentro de nuestro archivo de base de datos, tendremos nuestra migración
+
+Tambien, Dentro de la migración, y esta migración tiene dos propiedades titulo y competado
+
+Asi que en la migración de la tabla todos, se agregan los campos title y completed.
+
+De esta manera tendremos nuestro archivo de migración.
+
+	public function up(): void
+    {
+        Schema::create('todos', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->boolean('completed');
+            $table->timestamps();
+        });
+    }
+
+Veamos que podemos conectar con la base de datos
+
+Para ello utilizaremos un administrador de base de datos que trabaje con PostreSQL para nuestro caso utilizaremos
+	https://www.pgadmin.org/download/
+
+
+No hay tablas, que son las que se van a crear desde la migración
+
+Lo que si corremos es la migración
+	$ kool run artisan migrate
+
+
+Corriendo la migración, ahora podemos refresacr y ver que se cuentan ahora con las tablas 
+
+Segun el archivo de configuración .env
+
+la base de datos se llama laravel,  el usuario es root y la contraseña no esta especificada.
+
+	DB_CONNECTION=pgsql
+	DB_HOST=database
+	DB_PORT=5432
+	DB_DATABASE=laravel
+	DB_USERNAME=root
+	DB_PASSWORD=
+
+
+Para nuestr caso la configuración quedo de la siguiente manera:
+
+DB_CONNECTION=pgsql
+DB_HOST=database
+DB_PORT=5433
+DB_DATABASE=laravel
+DB_USERNAME=dev
+DB_PASSWORD=desarrollo
+
+
+
+
+Para este punto hemos configurado la conexión de un Administrador Grafico de laBD como lo es pgAdmin 4 desde Windows, en la sección 7 del apartado 2. Config.
+
+Y vamos a la base de datos y revisión de las tablas en pgAdmin:
+
+Databases > laravel > Schemas > Tables
+
+ahora podremos correr la migración para crear la tabla
+
+	$ kool run artisan migrate
+
+
+Esto crea nuestra tabla  todos
+
+si esto lo creamos con SQL quedaria asi:
+
+
+-- Table: public.todos
+
+-- DROP TABLE IF EXISTS public.todos;
+
+CREATE TABLE IF NOT EXISTS public.todos
+(
+    id bigint NOT NULL DEFAULT nextval('todos_id_seq'::regclass),
+    title character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    completed boolean NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    CONSTRAINT todos_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.todos
+    OWNER to dev;
+

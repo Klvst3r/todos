@@ -1,0 +1,98 @@
+Cnfigure with .env
+
+Actualizar el archivo .env
+
+
+Para los servicios de base de datos utilizaremos PostresQL
+asi que quedara como:
+	DB_HOST=database
+
+La conexion con la BD en el archivo de coniguración .env
+	BD_CONECTION=pgsql
+
+	DB_HOST=DATABASE
+
+	DB_PORT=5432
+
+
+Servicios de cache
+	REDIS_HOST=cache
+
+
+Con estos parametros de configuración seran necesarios como lo basico a utilizar, por ahora se puede correr de la siguiente manera la configuración:
+
+	$ kool run setup		
+
+Tomara algo de tiempo de manera significativa por que descargara las imagenes, la creación del entorno con los controladores necesarios, los controladore de la base de datos, el sistema de cache, creación de la aplicación, etc.
+
+
+Existen otros comandos que pueden correrse para ello tenemos la referencia se comandos de la documentación de kool.dev desde:
+
+	https://kool.dev/docs/presets/laravel
+
+Aca se cuentan com comandos para Argus o la utilización de atisan de PHP y hasta composer y MySQL
+
+Asi de manera resumida para iniciar un proyectocde Laravel con Docker en tres pasos se necesita
+	- Cumplir los requerimientos de entorno
+		1. Coorrer: run kool create laravel my-project
+		2. Actualizar el archivo .env.example
+		3. Correr: kool run setup
+
+	Permanecer en el entorno y establecer algunos presents adicionales.
+
+Asi para iniciar nuestri proyeto en tres pasos tenemos:
+
+	1- Run kool create laravel my-project
+	2- Update .env.example
+	3 - Run kool run setup
+
+Dentro de los requerimientos comntados de manera inicial esta la actualización cuando se considere necesario de kool.dev descargandola con:
+		$ kool self-update
+
+Para ejecutar nuestro proyecto desde nuestra carpeta del proyecto:
+	$ kool create laravel my-project
+
+Si queremos ejecutar una versión especifica por ejeplo de php 8.1 ejecutaremos:
+	$ composer create-project --no-install --no-scripts --prefer-dist laravel/laravel my-project using a customized kool Docker image: kooldev/php:8.1.
+
+		Despues de la instalación kool create ejecuta automaticamente
+			$ kool preset laravel
+Este comando ayudara a configurar de manera inicial el estack tecnologico necesario para nuestro asistente interactivo.
+
+Teniendo los comandos siguientes dissponibles:
+
+$ Preset laravel is initializing!
+
+? Which app service do you want to use [Use arrows to move, type to filter]
+> PHP 7.4
+  PHP 8.0
+
+? Which database service do you want to use [Use arrows to move, type to filter]
+> MySQL 8.0
+  MySQL 5.7
+  MariaDB 10.5
+  PostgreSQL 13.0
+  none
+
+? Which cache service do you want to use [Use arrows to move, type to filter]
+> Redis 6.0
+  Memcached 1.6
+  none
+
+? Which javascript package manager do you want to use [Use arrows to move, type to filter]
+> npm
+  yarn
+
+$ Preset laravel initialized!
+
+
+Si nos movemos a nuestra carpeta del proyeto
+	$ cd my-project
+
+El comando 'kool preset' podra generar de manera automatica los archivos de configuración y los añadira al proyecto, con lo que pueden modificarse a considerración:
+	+docker-compose.yml
+	+kool.yml
+
+Ahora es un buen momento para revisar estos archivos de configuración y verificar los servicios que concidan con las necesidades de nuestro proyecto de acuerdo al asistente.
+
+
